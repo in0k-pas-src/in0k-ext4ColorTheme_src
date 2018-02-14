@@ -8,6 +8,9 @@ uses Graphics,
     Classes, SysUtils;
 
 
+
+function in0k_ext4ColorTheme_clHotLight:tColor; {$ifOpt D-} inline; {$endIf}
+
 function color_Red:tColor;
 
 
@@ -16,7 +19,19 @@ function color_Red:tColor;
 
 implementation
 
+// clHotLight  -- Color for a hyperlink or hot-tracked item. The associated background color is COLOR_WINDOW.
+function in0k_ext4ColorTheme_clHotLight:tColor;
+begin
+    result:=clHotLight;
+end;
+
+
+// clHighlight -- Item(s) selected in a control. The associated foreground color is COLOR_HIGHLIGHTTEXT.
+
+
+
 const cStartColor=clHotLight;//clHighlight;
+
 
 function color_Red:tColor;
 var R,G,B:byte;
