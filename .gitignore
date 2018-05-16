@@ -1,1 +1,8 @@
 backup/*
+backup*/*
+*/backup/*
+*/lib/*
+*.exe
+*.ico
+*.res
+*.lps

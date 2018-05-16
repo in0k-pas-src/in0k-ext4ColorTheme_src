@@ -1,0 +1,38 @@
+object Form1: TForm1
+  Left = 455
+  Height = 503
+  Top = 114
+  Width = 495
+  Caption = 'Form1'
+  ClientHeight = 503
+  ClientWidth = 495
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  LCLVersion = '1.6.4.0'
+  object ColorListBox1: TColorListBox
+    Left = 0
+    Height = 503
+    Top = 0
+    Width = 224
+    Style = [cbCustomColors]
+    Align = alLeft
+    Font.CharSet = RUSSIAN_CHARSET
+    Font.Height = -13
+    Font.Name = 'Consolas'
+    Font.Pitch = fpFixed
+    Font.Quality = fqDraft
+    ItemHeight = 0
+    OnClick = ColorListBox1Click
+    ParentFont = False
+    TabOrder = 0
+  end
+  object Button1: TButton
+    Left = 261
+    Height = 25
+    Top = 77
+    Width = 75
+    Caption = 'Button1'
+    OnClick = Button1Click
+    TabOrder = 1
+  end
+end
