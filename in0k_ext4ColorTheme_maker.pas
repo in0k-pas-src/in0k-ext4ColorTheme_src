@@ -13,17 +13,24 @@ type
 
  tExt4ColorTheme_Colors=tColorsLAIR;
 
+ eExt4ColorTheme_ProduceMODE=(
+    eE4CT_PM__Lite,
+    eE4CT_PM__Normal,
+    eE4CT_PM__Full
+ );
+
+
 procedure Ext4ColorTheme_Colors__INI(out Colors:tExt4ColorTheme_Colors);
 procedure Ext4ColorTheme_Colors__DEL(var Colors:tExt4ColorTheme_Colors);
 
-procedure Ext4ColorTheme_Colors__addProduce(var Colors:tExt4ColorTheme_Colors; const RGB:tColor);
+procedure Ext4ColorTheme_Colors__addProduce(var Colors:tExt4ColorTheme_Colors; const RGB:tColor; const Mode:eExt4ColorTheme_ProduceMODE);
 
 procedure Ext4ColorTheme_Colors__delSimilar(var Colors:tExt4ColorTheme_Colors; const RGB:tColor; const delta:single=cMinDeltaE*4);
 
 
 
 
-procedure Ext4ColorTheme_Colors__addProduce_sysColors(var Colors:tExt4ColorTheme_Colors);
+procedure Ext4ColorTheme_Colors__addProduce_sysColors(var Colors:tExt4ColorTheme_Colors; const Mode:eExt4ColorTheme_ProduceMODE);
 procedure Ext4ColorTheme_Colors__delSimilar_sysColors(var Colors:tExt4ColorTheme_Colors; const delta:single=cMinDeltaE*4);
 
 procedure Ext4ColorTheme_Colors__sort(var Colors:tExt4ColorTheme_Colors; const RGB:tColor);
@@ -34,6 +41,10 @@ function  Ext4ColorTheme_Colors__enumFirst(const Colors:tExt4ColorTheme_Colors):
 function  Ext4ColorTheme_Colors__enumNext (const enNode:pointer):pointer;
 function  Ext4ColorTheme_Colors__enumColor(const enNode:pointer):tColor;
 function  Ext4ColorTheme_Colors__enumDelta(const enNode:pointer):Single;
+
+
+function  Ext4ColorTheme_Top(const Colors:tExt4ColorTheme_Colors):TColor;
+
 
 implementation
 
@@ -59,31 +70,41 @@ begin
 end;
 
 // добавить набор цветов, основанный на компанентах
-procedure _add_f8r8a_(var Colors:tExt4ColorTheme_Colors; const R,G,B:BYTE);
+procedure _add_f8r8a_(var Colors:tExt4ColorTheme_Colors; const R,G,B:BYTE; const mode:eExt4ColorTheme_ProduceMODE);
 begin // forward & reverse & additional
     // сплошная комбинаторика, тут очень МАЛО науки
     //---------------------------------------------
     // прямой цвет
-   _add_unique_(Colors,    r,    g,    b);
+    if mode in [eE4CT_PM__Lite,eE4CT_PM__Normal,eE4CT_PM__Full] then begin
+       _add_unique_(Colors,    r,    g,    b);
+    end;
     // "обратные" цвета
-   _add_unique_(Colors,$ff-r,$ff-g,$ff-b);
-   {_add_unique_(Colors,$ff-r,$ff-g,    b);
-   _add_unique_(Colors,$ff-r,    g,$ff-b);
-   _add_unique_(Colors,    r,$ff-g,$ff-b);
-   _add_unique_(Colors,$ff-r,    g,    b);
-   _add_unique_(Colors,    r,$ff-g,    b);
-   _add_unique_(Colors,    r,    g,$ff-b);}
+    if mode in [               eE4CT_PM__Normal               ] then begin
+       _add_unique_(Colors,$ff-r,$ff-g,$ff-b);
+    end;
+    if mode in [               eE4CT_PM__Normal,eE4CT_PM__Full] then begin
+       _add_unique_(Colors,$ff-r,$ff-g,    b);
+       _add_unique_(Colors,$ff-r,    g,$ff-b);
+       _add_unique_(Colors,    r,$ff-g,$ff-b);
+       _add_unique_(Colors,$ff-r,    g,    b);
+       _add_unique_(Colors,    r,$ff-g,    b);
+       _add_unique_(Colors,    r,    g,$ff-b);
+    end;
     // "дополняющие" цвета
-   _add_unique_(Colors,r-$ff,g-$ff,b-$ff);
-   {_add_unique_(Colors,r-$ff,g-$ff,b    );
-   _add_unique_(Colors,r-$ff,g    ,b-$ff);
-   _add_unique_(Colors,r    ,g-$ff,b-$ff);
-   _add_unique_(Colors,r-$ff,g    ,b    );
-   _add_unique_(Colors,r    ,g-$ff,b    );
-   _add_unique_(Colors,r    ,g    ,b-$ff);}
+    if mode in [               eE4CT_PM__Normal               ] then begin
+       _add_unique_(Colors,r-$ff,g-$ff,b-$ff);
+    end;
+    if mode in [               eE4CT_PM__Normal,eE4CT_PM__Full] then begin
+       _add_unique_(Colors,r-$ff,g-$ff,b    );
+       _add_unique_(Colors,r-$ff,g    ,b-$ff);
+       _add_unique_(Colors,r    ,g-$ff,b-$ff);
+       _add_unique_(Colors,r-$ff,g    ,b    );
+       _add_unique_(Colors,r    ,g-$ff,b    );
+       _add_unique_(Colors,r    ,g    ,b-$ff);
+    end;
 end;
 
-procedure Ext4ColorTheme_Colors__addProduce(var Colors:tExt4ColorTheme_Colors; const RGB:tColor);
+procedure Ext4ColorTheme_Colors__addProduce(var Colors:tExt4ColorTheme_Colors; const RGB:tColor; const Mode:eExt4ColorTheme_ProduceMODE);
 var r,g,b:BYTE;
 begin   {$ifOpt D+}
         Assert( ColorToRGB(RGB)=RGB ,'Wrong parameter RGB. Use ColorToRGB before!');
@@ -93,12 +114,12 @@ begin   {$ifOpt D+}
     b:=Blue (RGB);
     // перемешиваем компоненты, для генерации БОЛЬШЕГО числа цветов
     // сплошная комбинаторика, тут очень МАЛО науки
-   _add_f8r8a_(Colors, r,g,b);
-   _add_f8r8a_(Colors, r,b,g);
-   _add_f8r8a_(Colors, b,r,g);
-   _add_f8r8a_(Colors, g,r,b);
-   _add_f8r8a_(Colors, g,b,r);
-   _add_f8r8a_(Colors, b,g,r);
+   _add_f8r8a_(Colors, r,g,b, mode);
+   _add_f8r8a_(Colors, r,b,g, mode);
+   _add_f8r8a_(Colors, b,r,g, mode);
+   _add_f8r8a_(Colors, g,r,b, mode);
+   _add_f8r8a_(Colors, g,b,r, mode);
+   _add_f8r8a_(Colors, b,g,r, mode);
 end;
 
 
@@ -127,7 +148,7 @@ begin   {$ifOpt D+}
     ColorsLAIR_INIT(tmpColors);
     while ColorsLAIR_Present(Colors) do begin
         tmpNode:=ColorsLAIR_pop(Colors);
-        tmpNode^.delta:=csCalc_Delta.delta(RGB,tmpNode^.color);
+        tmpNode^.delta:=csCalc_Delta.delta(RGB,tmpNode^.color,1,1,1);
         ColorsLAIR_push(tmpColors,tmpNode)
     end;
     Colors:=tmpColors;
@@ -138,13 +159,13 @@ end;
 const // количество Системных цветов, MAX_SYS_COLORS - последний из них
   cExt4ColorTheme_sysColorCount=MAX_SYS_COLORS+1;
 
-procedure Ext4ColorTheme_Colors__addProduce_sysColors(var Colors:tExt4ColorTheme_Colors);
+procedure Ext4ColorTheme_Colors__addProduce_sysColors(var Colors:tExt4ColorTheme_Colors; const Mode:eExt4ColorTheme_ProduceMODE);
 var i:TColorRef;
     c:TColor;
 begin
     for i:=0 to cExt4ColorTheme_sysColorCount-1 do begin //< {1}
         c:=TColor(SYS_COLOR_BASE or i);
-        Ext4ColorTheme_Colors__addProduce(Colors, ColorToRGB(c));
+        Ext4ColorTheme_Colors__addProduce(Colors, ColorToRGB(c), Mode);
     end;
 end;
 
@@ -182,7 +203,14 @@ begin
     result:=pColorsNode(enNode)^.delta;
 end;
 
+//------------------------------------------------------------------------------
 
+function  Ext4ColorTheme_Top(const Colors:tExt4ColorTheme_Colors):TColor;
+var tmp:pointer;
+begin
+    tmp:=Ext4ColorTheme_Colors__enumFirst(Colors);
+    result:=Ext4ColorTheme_Colors__enumColor(tmp);
+end;
 
 end.
 
