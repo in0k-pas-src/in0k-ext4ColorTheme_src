@@ -9,6 +9,8 @@ uses Graphics,
 
 
 
+
+function in0k_ext4ColorTheme_clGrayText:tColor; {$ifOpt D-} inline; {$endIf}
 function in0k_ext4ColorTheme_clHotLight:tColor; {$ifOpt D-} inline; {$endIf}
 function in0k_ext4ColorTheme_asGreen   :tColor; {$ifOpt D-} inline; {$endIf}
 
@@ -31,7 +33,10 @@ end;
 
 // clHighlight -- Item(s) selected in a control. The associated foreground color is COLOR_HIGHLIGHTTEXT.
 
-
+function in0k_ext4ColorTheme_clGrayText:tColor;
+begin
+    result:=clGrayText;
+end;
 
 function in0k_ext4ColorTheme_asGreen:tColor;
 var R,G,B:byte;
